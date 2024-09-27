@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 320 
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/index.js"
+    }
+  ],
+  "env": {
+    "MONGO_DB": "mongodb+srv://voting_database:2002Thai%40@cluster0.ss9cw.mongodb.net/?retryWrites=true&w=majority"
+  }
+}

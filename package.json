@@ -1,0 +1,35 @@
+{
+  "name": "voting_backend_nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "hbs": "^4.2.0",
+    "mongoose": "^8.5.4",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.4",
+    "typescript": "^5.5.4",
+    "voting_backend_nodejs": "file:"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^22.5.0",
+    "ts-node": "^10.9.1"
+  }
+}

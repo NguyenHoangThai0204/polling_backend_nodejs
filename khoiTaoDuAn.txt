@@ -1,0 +1,6 @@
+Vào thư mục:
+    npm init 
+    
+    npm install --save-dev typescript @types/node @types/express @types/body-parser @types/cors @types/morgan
+    
+tạo file index.js để chạy
