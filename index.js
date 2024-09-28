@@ -9,7 +9,7 @@ const cors = require('cors');
 const routerUser = require("./src/routes/UserRoute");
 const routerPoll = require("./src/routes/PollRoute");
 const routerVote = require("./src/routes/VoteRoute");
-
+const routerSSO = require("./src/routes/SSORoute");
 dotenv.config(); 
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -24,7 +24,7 @@ app.use(morgan('common'));
 app.use('/api/user', routerUser);
 app.use('/api/poll', routerPoll);
 app.use('/api/vote', routerVote);
-
+app.use('/api/auth', routerSSO);
 // Route không tìm thấy
 app.use((req, res) => {
   res.status(404).send("Route not found");
