@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  listPoll : {
+    type: [{id_poll:String}],
+  },
   listVote:{
     type:[{id_vote:String}],
     default:[]

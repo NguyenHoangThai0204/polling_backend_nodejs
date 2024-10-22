@@ -2,7 +2,7 @@ const express =  require("express")
 const routers = express.Router();
 const pollController = require("../controller/PollController")
 
-// Post http://localhost:3000/api/user/create_polling
+// Post http://localhost:3000/api/poll/create_polling
 // {
 //     "authorId": "66cbc96d367aa89344e6c0d9",
 //     "avatar": "http://example.com/avatar.jpg",
@@ -31,11 +31,11 @@ const pollController = require("../controller/PollController")
 //     "typeContent": "public"
 // }
 routers.post("/create_polling", pollController.createPolling)
-// Get http://localhost:3000/api/user/find_all_polling/66cc0642f1858d86afad1666
+// Get http://localhost:3000/api/poll/find_all_polling/66cc0642f1858d86afad1666
 routers.get("/find_all_polling_user/:authorId", pollController.findAllPollingUser)
-// Get http://localhost:3000/api/user/find_all_polling/66cc0642f1858d86afad1666
+// Get http://localhost:3000/api/poll/find_all_polling/66cc0642f1858d86afad1666
 routers.get("/find_all_polling", pollController.findAllPolling)
-// Get http://localhost:3000/api/user/find_by_id_polling/66cc0642f1858d86afad1666
+// Get http://localhost:3000/api/poll/find_by_id_polling/66cc0642f1858d86afad1666
 routers.get("/find_by_id_polling/:id", pollController.findByIdPolling)
 
 module.exports = routers;

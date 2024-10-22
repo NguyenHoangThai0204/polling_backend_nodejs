@@ -25,12 +25,13 @@ app.use('/api/user', routerUser);
 app.use('/api/poll', routerPoll);
 app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
+
 // Route không tìm thấy
 app.use((req, res) => {
   res.status(404).send("Route not found");
 });
 
-// Kết nối MongoDB
+// Kết nối MongoDB  
 const connectToMongoDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_DB);

@@ -14,6 +14,9 @@ router.get("/findAllUser", userController.findAllUser);
 router.post("/login", userController.loginUser);
 
 // Get: http://localhost:3000/api/user/getUserByid/
+router.get("/getUserByid", userController.findByIdUser);
+
+// Get: http://localhost:3000/api/user/getUserByid/
 router.post("/findByIdUser", userController.findByIdUser);
 
 // Post: http://localhost:3000/api/user/updateUser

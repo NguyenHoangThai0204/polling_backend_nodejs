@@ -168,5 +168,5 @@ module.exports = {
   loginUser,
   findAllUser,
   findByIdUser,
-  updateUserStatusToNon,
+  updateUserStatusToNon
 };
