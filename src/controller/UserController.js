@@ -134,20 +134,6 @@ const findByIdUser = async (req, res) => {
 const updateUserStatusToNon = async (req, res) => {
   try {
     const { id } = req.body; // Lấy id từ body
-    // if (!id) {
-    //   return res.status(400).json({
-    //     status: "Err",
-    //     message: "ID is required.",
-    //   });
-    // }
-
-    // const user = await User.findById(id);
-    // if (!user) {
-    //   return res.status(404).json({
-    //     status: "Err",
-    //     message: "User not found.",
-    //   });
-    // }
 
     // Cập nhật trạng thái thành "non"
     await User.findByIdAndUpdate(id, { status: "inactive" });
@@ -161,12 +147,28 @@ const updateUserStatusToNon = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+const updateUserStatusToActive = async (req, res) => {
+  try {
+    const { id } = req.body; // Lấy id từ body
 
+    // Cập nhật trạng thái thành "non"
+    await User.findByIdAndUpdate(id, { status: "active" });
+
+    res.status(200).json({
+      status: "OK",
+      message: "User status updated to 'inactive'.",
+    });
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 module.exports = {
   createUser,
   loginUser,
   findAllUser,
   findByIdUser,
-  updateUserStatusToNon
+  updateUserStatusToNon,
+  updateUserStatusToActive,
 };
