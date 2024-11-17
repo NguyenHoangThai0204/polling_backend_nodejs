@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
 const app = express();
 const port = 3000;
 const dotenv = require('dotenv');
@@ -6,17 +8,19 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const routerUser = require("./src/routes/UserRoute");
-const routerPoll = require("./src/routes/PollRoute");
-const routerVote = require("./src/routes/VoteRoute");
-const routerSSO = require("./src/routes/SSORoute");
-dotenv.config(); 
+const routerUser = require('./src/routes/UserRoute');
+const routerPoll = require('./src/routes/PollRoute');
+const routerVote = require('./src/routes/VoteRoute');
+const routerSSO = require('./src/routes/SSORoute');
+const voteController = require('./src/controller/VoteController'); // Import controller
+
+dotenv.config();
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors({
-  origin: '*', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-  credentials: true 
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
 app.use(morgan('common'));
 
@@ -28,7 +32,7 @@ app.use('/api/auth', routerSSO);
 
 // Route không tìm thấy
 app.use((req, res) => {
-  res.status(404).send("Route not found");
+  res.status(404).send('Route not found');
 });
 
 // Kết nối MongoDB  
@@ -41,7 +45,25 @@ const connectToMongoDB = async () => {
   }
 };
 
-app.listen(port, () => {
+// Tạo server HTTP với express
+const server = http.createServer(app);
+
+// Tạo instance của socket.io
+const io = socketIo(server);
+
+// Lắng nghe kết nối WebSocket từ client
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
+
+// Truyền io đến VoteController
+voteController.setSocket(io);
+
+// Khởi động server
+server.listen(port, () => {
   connectToMongoDB();
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
