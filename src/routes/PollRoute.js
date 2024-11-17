@@ -37,5 +37,6 @@ routers.get("/find_all_polling_user/:authorId", pollController.findAllPollingUse
 routers.get("/find_all_polling", pollController.findAllPolling)
 // Get http://localhost:3000/api/poll/find_by_id_polling/66cc0642f1858d86afad1666
 routers.get("/find_by_id_polling/:id", pollController.findByIdPolling)
-
+// Post 
+routers.post("/updateTimeEndPoll/:id", pollController.updateTimeEndPoll)
 module.exports = routers;

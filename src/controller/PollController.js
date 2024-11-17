@@ -74,3 +74,20 @@ exports.findByIdPolling = async (req, res) => {
     }
 };
 
+// update timeend poll is time now
+exports.updateTimeEndPoll = async (req, res) => {
+    try {
+        const id = req.params.id;  // Lấy giá trị id từ params
+        const Polling = await ContentPoll.findById(id);
+        Polling.timeEnd = new Date();
+        await Polling.save();
+        res.status(200).json({
+            status: "OK",
+            message: "Success",
+            data: Polling
+        });
+    } catch (error) {
+        console.error("Error finding polling:", error);
+        res.status(500).json({ message: "Internal Server Error: " + error });
+    }
+};
