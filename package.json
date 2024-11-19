@@ -27,7 +27,8 @@
     "nodemon": "^3.1.4",
     "socket.io": "^4.8.1",
     "typescript": "^5.5.4",
-    "voting_backend_nodejs": "file:"
+    "voting_backend_nodejs": "file:",
+    "web3": "^4.15.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
