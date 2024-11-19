@@ -8,12 +8,14 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const routeContract = require('./src/routes/ContractRoute');
 const routerUser = require('./src/routes/UserRoute');
 const routerPoll = require('./src/routes/PollRoute');
 const routerVote = require('./src/routes/VoteRoute');
 const routerSSO = require('./src/routes/SSORoute');
 const voteController = require('./src/controller/VoteController'); // Import controller
 const routerTheNew = require('./src/routes/TheNewRoute');
+
 
 dotenv.config();
 
@@ -30,7 +32,11 @@ app.use('/api/user', routerUser);
 app.use('/api/poll', routerPoll);
 app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
+<<<<<<< HEAD
 app.use('/api/theNew', routerTheNew);
+=======
+app.use('/api/private',routeContract);
+>>>>>>> 7b78deb52208a268d34335109c9d91675a4f3961
 
 // Route không tìm thấy
 app.use((req, res) => {
@@ -46,6 +52,7 @@ const connectToMongoDB = async () => {
     console.log('Error connecting to MongoDB', error.message);
   }
 };
+
 
 // Tạo server HTTP với express
 const server = http.createServer(app);
