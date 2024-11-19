@@ -30,13 +30,10 @@ app.use(morgan('common'));
 // Định nghĩa các route
 app.use('/api/user', routerUser);
 app.use('/api/poll', routerPoll);
+app.use('/api/theNew', routerTheNew);
 app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
-<<<<<<< HEAD
-app.use('/api/theNew', routerTheNew);
-=======
 app.use('/api/private',routeContract);
->>>>>>> 7b78deb52208a268d34335109c9d91675a4f3961
 
 // Route không tìm thấy
 app.use((req, res) => {
