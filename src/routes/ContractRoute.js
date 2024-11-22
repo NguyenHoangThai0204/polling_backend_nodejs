@@ -7,7 +7,7 @@ const { Console } = require("console");
 
 console.log(web3Validator);
 // Kết nối với Ethereum node (ví dụ: Ganache)
-const web3 = new Web3("HTTP://127.0.0.1:7545");
+const web3 = new Web3("HTTP://127.0.0.1:8545");
 
 // ABI và địa chỉ của smart contract
 // Đọc ABI từ tệp JSON đã được biên dịch
@@ -15,7 +15,7 @@ const contractJSON = JSON.parse(
   fs.readFileSync("./build/contracts/PollingSys.json", "utf8")
 );
 const contractABI = contractJSON.abi;
-const contractAddress = "0x56FDa01f8a75915A8c52DF5F38c373C7186aCDA3";
+const contractAddress = "0x9Bf759Cc57FA6bcB07bB5d9db46aecB9DD95FFaB";
 
 // Tạo instance của smart contract
 const myContract = new web3.eth.Contract(contractABI, contractAddress);

@@ -21,6 +21,9 @@ const contentPollSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  pollIdSm:{
+    type: String || null,
+  },
   timeStart: {
     type: Date,
   },
