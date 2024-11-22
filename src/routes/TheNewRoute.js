@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router(); // Sử dụng router của express
 const theNewController = require("../controller/TheNewController");
 
-// Post: http://localhost:3000/api/theNew/createTheNew
+// Post: http://localhost:3000/api/theNew/create_the_new
 // {
 //     "tenBaiViet":"React js sự lựa chọn, lần đầu tiên tiếp cận ta nên làm gì",
 //     "chuDeBaiViet":"Công nghệ",
