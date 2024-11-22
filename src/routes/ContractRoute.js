@@ -12,7 +12,7 @@ const web3 = new Web3("HTTP://127.0.0.1:7545");
 // ABI và địa chỉ của smart contract
 // Đọc ABI từ tệp JSON đã được biên dịch
 const contractJSON = JSON.parse(
-  fs.readFileSync("./src/contracts/PollingSys.json", "utf8")
+  fs.readFileSync("./build/contracts/PollingSys.json", "utf8")
 );
 const contractABI = contractJSON.abi;
 const contractAddress = "0x56FDa01f8a75915A8c52DF5F38c373C7186aCDA3";
