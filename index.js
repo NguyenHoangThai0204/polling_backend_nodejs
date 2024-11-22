@@ -14,6 +14,7 @@ const routerPoll = require('./src/routes/PollRoute');
 const routerVote = require('./src/routes/VoteRoute');
 const routerSSO = require('./src/routes/SSORoute');
 const voteController = require('./src/controller/VoteController'); // Import controller
+const routerTheNew = require('./src/routes/TheNewRoute');
 
 
 dotenv.config();
@@ -29,6 +30,7 @@ app.use(morgan('common'));
 // Định nghĩa các route
 app.use('/api/user', routerUser);
 app.use('/api/poll', routerPoll);
+app.use('/api/theNew', routerTheNew);
 app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
 app.use('/api/private',routeContract);
