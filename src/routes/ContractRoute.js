@@ -15,7 +15,7 @@ const contractJSON = JSON.parse(
   fs.readFileSync("./build/contracts/PollingSys.json", "utf8")
 );
 const contractABI = contractJSON.abi;
-const contractAddress = "0x56FDa01f8a75915A8c52DF5F38c373C7186aCDA3";
+const contractAddress = "0x15B1B59f1437431E2A811B74eEDa132E817a6d82";
 
 // Tạo instance của smart contract
 const myContract = new web3.eth.Contract(contractABI, contractAddress);
