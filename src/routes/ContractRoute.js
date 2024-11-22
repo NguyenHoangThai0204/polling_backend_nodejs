@@ -7,7 +7,7 @@ const { Console } = require("console");
 
 console.log(web3Validator);
 // Kết nối với Ethereum node (ví dụ: Ganache)
-const web3 = new Web3("HTTP://127.0.0.1:7545");
+const web3 = new Web3("HTTP://127.0.0.1:8545");
 
 // ABI và địa chỉ của smart contract
 // Đọc ABI từ tệp JSON đã được biên dịch
