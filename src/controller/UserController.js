@@ -1,6 +1,52 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
+
+const sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+    // Kiểm tra xem email đã tồn tại chưa
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "This email is already registered." });
+    }
+
+    // Tạo OTP ngẫu nhiên (6 chữ số)
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    // Lưu OTP tạm thời (Redis hoặc MongoDB)
+    await OtpModel.create({ email, otp, createdAt: new Date() });
+
+    // Gửi OTP qua email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "your-email@gmail.com",
+        pass: "your-email-password",
+      },
+    });
+
+    await transporter.sendMail({
+      from: '"Your App Name" <your-email@gmail.com>',
+      to: email,
+      subject: "Your OTP for Account Verification",
+      text: `Your OTP code is: ${otp}`,
+    });
+
+    return res.status(200).json({ message: "OTP sent to your email." });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 const createUser = async (req, res) => {
   try {
     const {
@@ -171,4 +217,5 @@ module.exports = {
   findByIdUser,
   updateUserStatusToNon,
   updateUserStatusToActive,
+  sendOtp,
 };
