@@ -58,3 +58,67 @@ exports.createVote = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error: ' + error.message });
   }
 };
+exports.createVotePrivate = async (req, res) => {
+  try {
+    const { pollId, userId, optionId } = req.body;
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!pollId || !userId || !optionId) {
+      return res
+        .status(400)
+        .json({ message: "pollId, userId, and optionId are required." });
+    }
+
+    // Kiểm tra xem userId đã vote cho pollId này chưa
+    const existingVote = await Vote.findOne({ pollId, userId });
+
+    if (existingVote) {
+      return res.status(400).json({
+        message: "You have already voted in this poll.",
+        pollId: pollId,
+        userId: userId,
+      });
+    }
+
+    // Tạo đối tượng Vote và lưu vào database
+    const vote = new Vote({ pollId, userId, optionId });
+    await vote.save();
+    console.log("Vote saved:", vote);
+
+    // Tìm và cập nhật Poll với optionId
+    const updatedPoll = await ContentPoll.findOneAndUpdate(
+      { _id: pollId, "options._id": optionId },
+      { $push: { "options.$.votes": vote._id } },
+      { new: true }
+    );
+
+    if (!updatedPoll) {
+      return res.status(404).json({
+        message: "Option not found in Poll",
+        pollId: pollId,
+        optionId: optionId,
+      });
+    }
+
+    // Emit sự kiện WebSocket nếu có
+    if (io) {
+      io.emit("voteUpdate", {
+        pollId: updatedPoll._id,
+        updatedPoll: updatedPoll,
+      });
+    }
+
+    res.status(200).json({
+      status: "OK",
+      message: "Vote created successfully",
+      data: {
+        vote: vote,
+        updatedPoll: updatedPoll,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating vote:", error);
+    res.status(500).json({ message: "Internal Server Error: " + error.message });
+  }
+};
+
