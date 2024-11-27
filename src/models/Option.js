@@ -9,6 +9,10 @@ const optionSchema = new mongoose.Schema({
   descriptionContentOption: {
     type: String,
   },
+  avatarContentOption: {
+    type: String,
+    default: '',
+  },  
   additonalContentOption: {
     type: String,
   },

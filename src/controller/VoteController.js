@@ -121,4 +121,28 @@ exports.createVotePrivate = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error: " + error.message });
   }
 };
+// Hàm lấy tất cả Vote của một Poll theo pollId
+exports.getVotesByPollId = async (req, res) => {
+  try {
+    const {pollId} = req.body;  // Lấy pollid từ query string
+
+    // Kiểm tra pollId
+    if (!mongoose.Types.ObjectId.isValid(pollId)) {
+      return res.status(400).json({ message: 'Invalid pollId' });
+    }
+
+    // Tìm tất cả Vote của Poll theo pollId
+    const votes = await Vote.find({ pollId: pollId });
+
+    res.status(200).json({
+      status: 'OK',
+      message: 'Get votes by pollId success',
+      data: votes
+    });
+
+  } catch (error) {
+    console.error('Error getting votes by pollId:', error);
+    res.status(500).json({ message: 'Internal Server Error: ' + error.message });
+  }
+};
 

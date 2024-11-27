@@ -8,23 +8,23 @@ router.post("/signUpGmail", userController.signUpWithGmail);
 router.post("/signup", userController.createUser);
 
 // Get: http://localhost:3000/api/user/findAllUser
-router.get("/findAllUser", userController.findAllUser);
+router.get("/find_all_user", userController.findAllUser);
 
 // Post: http://localhost:3000/api/user/login
 // {"email":"xinchao","password":"xinhaha"}
 router.post("/login", userController.loginUser);
 
 // Get: http://localhost:3000/api/user/getUserByid/
-router.get("/getUserByid", userController.findByIdUser);
+router.get("/get_user_byid", userController.findByIdUser);
 
 // Get: http://localhost:3000/api/user/getUserByid/
-router.post("/findByIdUser", userController.findByIdUser);
+router.post("/find_by_id_user", userController.findByIdUser);
 
 // Post: http://localhost:3000/api/user/updateUser
 // {
 //     "id":"66cbc96d367aa89344e6c0d9"
 // }
-router.post("/deletedUser", userController.updateUserStatusToNon);
+router.post("/deleted_user", userController.updateUserStatusToNon);
 
 // Post: http://localhost:3000/api/user/updateUser
 router.post("/undeleteUser", userController.updateUserStatusToActive);
