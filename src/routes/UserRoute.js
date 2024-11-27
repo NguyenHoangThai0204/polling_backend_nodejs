@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router(); // Sử dụng router của express
 const userController = require("../controller/UserController");
+const {uploadFileMiddleware} = require("../controller/fileUpload");
+
+// Post: http://localhost:3000/api/user/updateUser
+router.put("/update_user/:id", userController.updateUser);
 
 router.post("/signUpGmail", userController.signUpWithGmail);
 // Post: http://localhost:3000/api/user/signup
@@ -28,5 +32,6 @@ router.post("/deleted_user", userController.updateUserStatusToNon);
 
 // Post: http://localhost:3000/api/user/updateUser
 router.post("/undeleteUser", userController.updateUserStatusToActive);
+
 
 module.exports = router;

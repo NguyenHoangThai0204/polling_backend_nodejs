@@ -15,6 +15,7 @@ const routerVote = require('./src/routes/VoteRoute');
 const routerSSO = require('./src/routes/SSORoute');
 const voteController = require('./src/controller/VoteController'); // Import controller
 const routerTheNew = require('./src/routes/TheNewRoute');
+const routerUpload = require('./src/routes/UploadRoute');
 
 
 
@@ -35,6 +36,7 @@ app.use('/api/theNew', routerTheNew);
 app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
 app.use('/api/private',routeContract);
+app.use('/api/upload', routerUpload);
 
 
 // Route không tìm thấy
