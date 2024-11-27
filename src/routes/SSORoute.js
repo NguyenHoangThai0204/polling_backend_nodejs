@@ -6,4 +6,5 @@ const ssoController = require("../controller/SSOController");
 router.post("/google", ssoController.googleLogin);
 
 
+
 module.exports = router;

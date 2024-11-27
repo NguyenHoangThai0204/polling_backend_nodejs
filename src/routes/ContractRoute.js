@@ -3,7 +3,6 @@ const routers = express.Router();
 const { Web3 } = require("web3");
 const fs = require("fs");
 const web3Validator = require("web3-validator");
-const { Console } = require("console");
 
 console.log(web3Validator);
 // Kết nối với Ethereum node (ví dụ: Ganache)
