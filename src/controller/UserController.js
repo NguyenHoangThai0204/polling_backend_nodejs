@@ -296,6 +296,7 @@ const updateUserStatusToNon = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 const updateUserStatusToActive = async (req, res) => {
   try {
     const { id } = req.body; // Lấy id từ body

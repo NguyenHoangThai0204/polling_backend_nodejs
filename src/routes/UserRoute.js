@@ -6,7 +6,9 @@ const {uploadFileMiddleware} = require("../controller/fileUpload");
 // Post: http://localhost:3000/api/user/updateUser
 router.put("/update_user/:id", userController.updateUser);
 
+// Post: http://localhost:3000/api/user/signUpGmail
 router.post("/signUpGmail", userController.signUpWithGmail);
+
 // Post: http://localhost:3000/api/user/signup
 // {"email":"xinchao","password":"xinhaha", "fullName":"Nguyễn Hoàng Thái"}
 router.post("/signup", userController.createUser);
