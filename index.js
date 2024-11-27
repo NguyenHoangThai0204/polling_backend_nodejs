@@ -17,6 +17,7 @@ const voteController = require('./src/controller/VoteController'); // Import con
 const routerTheNew = require('./src/routes/TheNewRoute');
 
 
+
 dotenv.config();
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -34,6 +35,7 @@ app.use('/api/theNew', routerTheNew);
 app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
 app.use('/api/private',routeContract);
+
 
 // Route không tìm thấy
 app.use((req, res) => {

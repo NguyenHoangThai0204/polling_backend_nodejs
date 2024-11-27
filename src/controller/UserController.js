@@ -1,51 +1,66 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const { error } = require("console");
+const { default: test } = require("node:test");
+const nodemailer = require("nodemailer");
+const Mailgen = require("mailgen");
 
+const signUpWithGmail = (req, res) => {
 
-const sendOtp = async (req, res) => {
-  try {
-    const { email } = req.body;
+  const { userEmail } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required." });
-    }
-
-    // Kiểm tra xem email đã tồn tại chưa
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "This email is already registered." });
-    }
-
-    // Tạo OTP ngẫu nhiên (6 chữ số)
-    const otp = crypto.randomInt(100000, 999999).toString();
-
-    // Lưu OTP tạm thời (Redis hoặc MongoDB)
-    await OtpModel.create({ email, otp, createdAt: new Date() });
-
-    // Gửi OTP qua email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "your-email@gmail.com",
-        pass: "your-email-password",
-      },
-    });
-
-    await transporter.sendMail({
-      from: '"Your App Name" <your-email@gmail.com>',
-      to: email,
-      subject: "Your OTP for Account Verification",
-      text: `Your OTP code is: ${otp}`,
-    });
-
-    return res.status(200).json({ message: "OTP sent to your email." });
-  } catch (error) {
-    console.error("Error sending OTP:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+  let config = {
+      service : 'gmail',
+      auth : {
+          user: process.env.EMAIL,
+          pass: process.env.PASSWORD
+      }
   }
-};
+
+  let transporter = nodemailer.createTransport(config);
+
+  let MailGenerator = new Mailgen({
+      theme: "default",
+      product : {
+          name: "VOTING T&M SYSTEM",
+          link : 'https://mailgen.js/'
+      }
+  })
+
+  let response = {
+      body: {
+          name : "VOTING SYSTEM",
+          intro: "SIGN UP SUCCESSFULLY !!!",
+          action: {
+              instructions: "To get started with Voting System, please click here:",
+              button: {
+                  color: '#22BC66',
+                  text: 'Confirm your account',
+                  link: 'http://localhost:3000/api/user/signup'
+              }
+          },
+          outro: 'Need help, or have questions? Just reply to this email, we\'d love to help.'
+      }
+  }
+
+  let mail = MailGenerator.generate(response)
+
+  let message = {
+      from : process.env.EMAIL,
+      to : userEmail,
+      subject: "SIGN UP SUCCESSFULLY",
+      html: mail
+  }
+
+  transporter.sendMail(message).then(() => {
+      return res.status(201).json({
+          msg: "you should receive an email"
+      })
+  }).catch(error => {
+      return res.status(500).json({ error })
+  })
+
+}
 
 const createUser = async (req, res) => {
   try {
@@ -69,7 +84,15 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ message: "email and password are required." });
     }
-
+    const checkUser = await User.findOne({
+      email: email,
+    });
+    if (checkUser !== null) {
+      return res.status(500).json({
+        status: "Err",
+        message: "email is already defined.",
+      });
+    }
     const newUser = new User({
       email,
       password,
@@ -218,5 +241,5 @@ module.exports = {
   findByIdUser,
   updateUserStatusToNon,
   updateUserStatusToActive,
-  sendOtp,
+  signUpWithGmail,
 };
