@@ -148,7 +148,7 @@ const signUpWithGmail = (req, res) => {
       return res.status(500).json({ error })
   })
 
-}
+}}
 
 const createUser = async (req, res) => {
   try {
@@ -332,3 +332,4 @@ module.exports = {
   signUpWithGmail,
   updateUser,
 };
+
