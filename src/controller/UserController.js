@@ -93,54 +93,62 @@ const signUpWithGmail = (req, res) => {
       pass: process.env.PASSWORD,
     },
   };
+const signUpWithGmail = (req, res) => {
+
+  const { userEmail } = req.body;
+
+  let config = {
+      service : 'gmail',
+      auth : {
+          user: process.env.EMAIL,
+          pass: process.env.PASSWORD
+      }
+  }
 
   let transporter = nodemailer.createTransport(config);
 
   let MailGenerator = new Mailgen({
-    theme: "default",
-    product: {
-      name: "VOTING T&M SYSTEM",
-      link: "https://mailgen.js/",
-    },
-  });
+      theme: "default",
+      product : {
+          name: "VOTING T&M SYSTEM",
+          link : 'https://mailgen.js/'
+      }
+  })
 
   let response = {
-    body: {
-      name: "VOTING SYSTEM",
-      intro: "SIGN UP SUCCESSFULLY !!!",
-      action: {
-        instructions: "To get started with Voting System, please click here:",
-        button: {
-          color: "#22BC66",
-          text: "Confirm your account",
-          link: "http://localhost:3000/api/user/signup",
-        },
-      },
-      outro:
-        "Need help, or have questions? Just reply to this email, we'd love to help.",
-    },
-  };
+      body: {
+          name : "VOTING SYSTEM",
+          intro: "SIGN UP SUCCESSFULLY !!!",
+          action: {
+              instructions: "To get started with Voting System, please click here:",
+              button: {
+                  color: '#22BC66',
+                  text: 'Confirm your account',
+                  link: 'http://localhost:3000/api/user/signup'
+              }
+          },
+          outro: 'Need help, or have questions? Just reply to this email, we\'d love to help.'
+      }
+  }
 
-  let mail = MailGenerator.generate(response);
+  let mail = MailGenerator.generate(response)
 
   let message = {
-    from: process.env.EMAIL,
-    to: userEmail,
-    subject: "SIGN UP SUCCESSFULLY",
-    html: mail,
-  };
+      from : process.env.EMAIL,
+      to : userEmail,
+      subject: "SIGN UP SUCCESSFULLY",
+      html: mail
+  }
 
-  transporter
-    .sendMail(message)
-    .then(() => {
+  transporter.sendMail(message).then(() => {
       return res.status(201).json({
-        msg: "you should receive an email",
-      });
-    })
-    .catch((error) => {
-      return res.status(500).json({ error });
-    });
-};
+          msg: "you should receive an email"
+      })
+  }).catch(error => {
+      return res.status(500).json({ error })
+  })
+
+}
 
 const createUser = async (req, res) => {
   try {
