@@ -35,5 +35,4 @@ router.post("/deleted_user", userController.updateUserStatusToNon);
 // Post: http://localhost:3000/api/user/updateUser
 router.post("/undeleteUser", userController.updateUserStatusToActive);
 
-
 module.exports = router;
