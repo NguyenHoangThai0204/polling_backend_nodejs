@@ -1,3 +1,4 @@
 # dùng để khi đẩy code ngoại trừ các file này
 node_modules
 .vercel
+.env
