@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
+require("dotenv").config();
 
 const updateUser = async (req, res) => {
   try {
@@ -78,15 +79,25 @@ const updateUser = async (req, res) => {
     console.error("Error updating user:", error);
     res.status(500).json({ status: "Err", message: "Internal Server Error" });
   }
-};const signUpWithGmail = (req, res) => {
-  const { userEmail } = req.body;
+};
+
+const signUpWithGmail = (req, res) => {
+  const { userMail } = req.body;
 
   const config = {
     service: 'gmail',
+    port: 465,
+    secure: true,
+    logger: true,
+    debug: true,
+    secureConnection: 'true',
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
+    tls:{
+      rejectUnauthorized: false
+    }
   };
 
   const transporter = nodemailer.createTransport(config);
@@ -119,11 +130,12 @@ const updateUser = async (req, res) => {
 
   const message = {
     from: process.env.EMAIL,
-    to: userEmail,
+    to: userMail,
     subject: 'ĐĂNG KÝ THÀNH CÔNG',
     html: mail,
   };
-
+  console.log("Sending email to:", userMail);
+  console.log("Email content:", mail);
   transporter
     .sendMail(message)
     .then(() => {
@@ -162,10 +174,11 @@ const createUser = async (req, res) => {
     const checkUser = await User.findOne({
       email: email,
     });
-    if (checkUser !== null) {
-      return res.status(500).json({
-        status: "Err",
-        message: "email is already defined.",
+    // Kiểm tra xem email đã tồn tại hay chưa
+    if (checkUser) {
+      return res.status(409).json({
+        status: "Error",
+        message: "Email is already defined.",
       });
     }
     const newUser = new User({
