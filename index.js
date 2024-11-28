@@ -16,7 +16,7 @@ const routerSSO = require('./src/routes/SSORoute');
 const voteController = require('./src/controller/VoteController'); // Import controller
 const routerTheNew = require('./src/routes/TheNewRoute');
 const routerUpload = require('./src/routes/UploadRoute');
-
+const routerAI = require('./src/routes/AIRouter');
 
 
 dotenv.config();
@@ -37,7 +37,7 @@ app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
 app.use('/api/private',routeContract);
 app.use('/api/upload', routerUpload);
-
+app.use('/api/ai', routerAI);
 
 // Route không tìm thấy
 app.use((req, res) => {
