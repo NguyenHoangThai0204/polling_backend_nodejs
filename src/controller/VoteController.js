@@ -145,4 +145,48 @@ exports.getVotesByPollId = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error: ' + error.message });
   }
 };
+// hàm lấy vote detail dựa trên userid và pollid
+exports.getVoteByUserIdAndPollId = async (req, res) => {
+  try {
+    const { pollId, userId } = req.body; // Lấy pollId và userId từ body
 
+    // Kiểm tra pollId và userId
+    if (!mongoose.Types.ObjectId.isValid(pollId)) {
+      return res.status(400).json({ message: 'Invalid pollId' });
+    }
+    if (!userId) {
+      return res.status(400).json({ message: 'Invalid userId' });
+    }
+
+    // Tìm Vote của userId trong Poll theo pollId
+    const vote = await Vote.findOne({ pollId: pollId, userId: userId });
+
+    if (!vote) {
+      return res.status(404).json({
+        status: 'NOT_FOUND',
+        message: 'Vote not found for the given userId and pollId',
+      });
+    }
+
+    // Phát sự kiện qua Socket.IO nếu tìm thấy vote
+    if (io) {
+      io.emit('voteDetailFetched', {
+        pollId: pollId,
+        userId: userId,
+        vote: vote,
+      });
+      console.log(`WebSocket event "voteDetailFetched" emitted for pollId: ${pollId}, userId: ${userId}`);
+    } else {
+      console.log('Socket.io instance is not set');
+    }
+
+    res.status(200).json({
+      status: 'OK',
+      message: 'Get vote by userId and pollId success',
+      data: vote,
+    });
+  } catch (error) {
+    console.error('Error getting vote by userId and pollId:', error);
+    res.status(500).json({ message: 'Internal Server Error: ' + error.message });
+  }
+};
