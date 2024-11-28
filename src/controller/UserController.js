@@ -1,7 +1,5 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const { error } = require("console");
-const { default: test } = require("node:test");
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
@@ -80,75 +78,64 @@ const updateUser = async (req, res) => {
     console.error("Error updating user:", error);
     res.status(500).json({ status: "Err", message: "Internal Server Error" });
   }
-};
-
-
-const signUpWithGmail = (req, res) => {
+};const signUpWithGmail = (req, res) => {
   const { userEmail } = req.body;
 
-  let config = {
-    service: "gmail",
+  const config = {
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
   };
-const signUpWithGmail = (req, res) => {
 
-  const { userEmail } = req.body;
+  const transporter = nodemailer.createTransport(config);
 
-  let config = {
-      service : 'gmail',
-      auth : {
-          user: process.env.EMAIL,
-          pass: process.env.PASSWORD
-      }
-  }
+  const MailGenerator = new Mailgen({
+    theme: 'default',
+    product: {
+      name: 'HỆ THỐNG BÌNH CHỌN T&M',
+      link: 'https://mailgen.js/',
+    },
+  });
 
-  let transporter = nodemailer.createTransport(config);
+  const response = {
+    body: {
+      name: 'HỆ THỐNG BÌNH CHỌN',
+      intro: 'ĐĂNG KÝ THÀNH CÔNG !!!',
+      action: {
+        instructions: 'Để tiếp tục, vui lòng truy cập trang đăng nhập bằng cách nhấn vào nút bên dưới:',
+        button: {
+          color: '#22BC66',
+          text: 'Đăng nhập vào tài khoản của bạn',
+          link: 'http://localhost:3000/api/user/login', // Link đến trang đăng nhập
+        },
+      },
+      outro: "Nếu bạn cần hỗ trợ hoặc có thắc mắc, vui lòng trả lời email này, chúng tôi sẵn sàng giúp đỡ.",
+    },
+  };
 
-  let MailGenerator = new Mailgen({
-      theme: "default",
-      product : {
-          name: "VOTING T&M SYSTEM",
-          link : 'https://mailgen.js/'
-      }
-  })
+  const mail = MailGenerator.generate(response);
 
-  let response = {
-      body: {
-          name : "VOTING SYSTEM",
-          intro: "SIGN UP SUCCESSFULLY !!!",
-          action: {
-              instructions: "To get started with Voting System, please click here:",
-              button: {
-                  color: '#22BC66',
-                  text: 'Confirm your account',
-                  link: 'http://localhost:3000/api/user/signup'
-              }
-          },
-          outro: 'Need help, or have questions? Just reply to this email, we\'d love to help.'
-      }
-  }
+  const message = {
+    from: process.env.EMAIL,
+    to: userEmail,
+    subject: 'ĐĂNG KÝ THÀNH CÔNG',
+    html: mail,
+  };
 
-  let mail = MailGenerator.generate(response)
-
-  let message = {
-      from : process.env.EMAIL,
-      to : userEmail,
-      subject: "SIGN UP SUCCESSFULLY",
-      html: mail
-  }
-
-  transporter.sendMail(message).then(() => {
+  transporter
+    .sendMail(message)
+    .then(() => {
       return res.status(201).json({
-          msg: "you should receive an email"
-      })
-  }).catch(error => {
-      return res.status(500).json({ error })
-  })
+        msg: 'Bạn sẽ nhận được email xác nhận.',
+      });
+    })
+    .catch((error) => {
+      return res.status(500).json({ error });
+    });
+};
 
-}}
 
 const createUser = async (req, res) => {
   try {
