@@ -6,3 +6,5 @@ Vào thư mục:
     npm install mongodb
      npm install aws-sdk
 tạo file index.js để chạy
+
+git reset --hard HEAD~2
