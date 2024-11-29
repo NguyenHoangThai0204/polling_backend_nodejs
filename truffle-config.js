@@ -5,7 +5,7 @@ module.exports = {
   networks: {
     development: {
       host: "127.0.0.1",     // Địa chỉ Ganache
-      port: 7545,            // Cổng Ganache (thường là 7545)
+      port: 8545,            // Cổng Ganache (thường là 7545)
       network_id: "*",       // Kết nối với mọi network
     },
   },
