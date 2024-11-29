@@ -1,13 +1,22 @@
 const express = require("express");
 const router = express.Router(); // Sử dụng router của express
 const userController = require("../controller/UserController");
-const {uploadFileMiddleware} = require("../controller/fileUpload");
+const { passwordResetVerificationValidator } = require("../helpers/Validations");
+
+// Post: http://localhost:3000/api/user/resetPassword
+router.put("/resetPassword", userController.resetPasswordByEmail);
 
 // Post: http://localhost:3000/api/user/updateUser
 router.put("/update_user/:id", userController.updateUser);
 
 // Post: http://localhost:3000/api/user/signUpGmail
 router.post("/signUpGmail", userController.signUpWithGmail);
+
+// Post: http://localhost:3000/api/user/forgotPassword
+router.post("/forgotPassword", passwordResetVerificationValidator, userController.forgotPassword);
+
+// Post: http://localhost:3000/api/user/verifyOTP
+router.post("/verifyOTP", userController.verifyOTP);
 
 // Post: http://localhost:3000/api/user/signup
 // {"email":"xinchao","password":"xinhaha", "fullName":"Nguyễn Hoàng Thái"}
