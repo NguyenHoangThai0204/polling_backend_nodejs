@@ -39,4 +39,7 @@ routers.get("/find_all_polling", pollController.findAllPolling)
 routers.get("/find_by_id_polling/:id", pollController.findByIdPolling)
 // Post 
 routers.post("/update_timeEnd_poll/:id", pollController.updateTimeEndPoll)
+
+routers.post("/delete_poll", pollController.deletePolling)
+
 module.exports = routers;

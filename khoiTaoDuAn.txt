@@ -8,3 +8,7 @@ Vào thư mục:
 tạo file index.js để chạy
 
 git reset --hard HEAD~2
+
+
+chế độ tự động xoá
+npm install node-cron

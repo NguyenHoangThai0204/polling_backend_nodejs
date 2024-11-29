@@ -212,22 +212,20 @@ const loginUser = async (req, res) => {
     if (!email || !password) {
       return res.status(500).json({
         status: "Err",
-        message: "email and password are required.",
+        message: "Email and password are required.",
       });
     }
 
-    const checkUser = await User.findOne({
-      email: email,
-    });
-    if (checkUser === null) {
+    const checkUser = await User.findOne({ email: email });
+    if (!checkUser) {
       return res.status(500).json({
         status: "Err",
-        message: "email is not defined.",
+        message: "Email is not defined.",
       });
     }
 
-    const checkPassword = bcrypt.compare(password, checkUser.password);
-    if (!checkPassword) {
+    // Kiểm tra mật khẩu trực tiếp
+    if (password !== checkUser.password) {
       return res.status(500).json({
         status: "Err",
         message: "Password is incorrect",
@@ -244,6 +242,7 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 const findAllUser = async (req, res) => {
   try {
