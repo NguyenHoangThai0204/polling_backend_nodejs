@@ -17,9 +17,8 @@ const voteController = require('./src/controller/VoteController'); // Import con
 const routerTheNew = require('./src/routes/TheNewRoute');
 const routerUpload = require('./src/routes/UploadRoute');
 const routerAI = require('./src/routes/AIRouter');
-const ContentPoll = require('./src/models/ContentPoll');
 
-// Tải cấu hình từ file .env
+
 dotenv.config();
 
 // Middleware
@@ -41,7 +40,12 @@ app.use('/api/private', routeContract);
 app.use('/api/upload', routerUpload);
 app.use('/api/ai', routerAI);
 
-// Kết nối MongoDB
+// Route không tìm thấy
+app.use((req, res) => {
+  res.status(404).send('Route not found');
+});
+
+// Kết nối MongoDB  
 const connectToMongoDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_DB);
