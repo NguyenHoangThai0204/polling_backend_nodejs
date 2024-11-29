@@ -2,7 +2,256 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
+const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+const PasswordReset = require("../models/PasswordReset");
+const Mailer = require("../helpers/Mailer");
+const {TokenExpiredError } = jwt;
+
 require("dotenv").config();
+
+const resetPasswordByEmail = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        msg: "Email and password are required",
+      });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        msg: "User not found",
+      });
+    }
+    user.password = password;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      msg: "Password reset successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      msg: error.message,
+    });
+  }
+}
+  
+const forgotPassword = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        msg: "Validation error",
+        errors: errors.array(),
+      });
+    }
+    const { email } = req.body;
+    const userData = await User.findOne({ email });
+    if (!userData) {
+      return res.status(400).json({
+        success: false,
+        msg: "Email does not exist",
+      });
+    }
+    // Tạo OTP 6 chữ số
+    const generateOTP = () =>
+      Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Gọi hàm để sinh OTP
+    const randomOTP = generateOTP();
+    console.log("OTP: ", randomOTP);
+    // Tạo JWT chứa email và OTP
+    const token = jwt.sign({ email, randomOTP }, process.env.JWT_SECRET, {
+      expiresIn: "5m",
+    });
+    //xóa token của email cũ
+    await PasswordReset.deleteMany({ email: email});
+
+    const passwordReset = new PasswordReset({
+      user_id: userData._id,
+      email: email,
+      token,
+    });
+    await passwordReset.save();
+    // Gửi email chứa OTP
+    const subject = "Reset Your Password - OTP Included";
+    const content = `
+  <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+    <h2 style="color: #007bff;">Hello ${userData.fullName},</h2>
+    <p>You requested to reset your password. Here is your OTP:</p>
+    <p style="font-size: 1.5em; font-weight: bold; color: #ff5733;">${randomOTP}</p>
+    <p>This OTP is valid for the next 5 minutes. Please use it to complete your password reset process.</p>
+    <p>If you did not request this, please ignore this email.</p>
+    <br>
+    <p>Best regards,<br><strong>Your Service Team</strong></p>
+  </div>
+`;
+
+    Mailer.sendMail(email, subject, content);
+    return res.status(201).json({
+      success: true,
+      msg: "OTP sent to your email. Please check your inbox.",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      msg: error.message,
+    });
+  }
+};
+// const verifyOTP = async (req, res) => {
+//   try {
+//     const { email, otp } = req.body;
+//     console.log("Received email:", email);
+//     console.log("Received OTP:", otp);
+
+//     if (!email || !otp) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Email and OTP are required",
+//       });
+//     }
+
+//     const passwordReset = await PasswordReset.findOne({ token: { $exists: true } });
+//     if (!passwordReset) {
+//       return res.status(404).json({
+//         success: false,
+//         msg: "OTP not found",
+//       });
+//     }
+//     console.log("Found password reset token:", passwordReset.token);
+
+//     let decoded;
+//     try {
+//       decoded = jwt.verify(passwordReset.token, process.env.JWT_SECRET);
+//     } catch (err) {
+//       console.error("JWT verification failed:", err);
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Invalid OTP token",
+//       });
+//     }
+//     console.log("Decoded JWT:", decoded);
+
+//     if (decoded.email !== email || decoded.randomOTP !== otp) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "Invalid OTP",
+//       });
+//     }
+
+//     const tokenExpirationTime = decoded.exp * 1000;
+//     const currentTime = Date.now();
+//     console.log("Token expiration time:", tokenExpirationTime);
+//     console.log("Current time:", currentTime);
+
+//     if (currentTime > tokenExpirationTime) {
+//       return res.status(400).json({
+//         success: false,
+//         msg: "OTP has expired",
+//       });
+//     }
+
+//     await PasswordReset.deleteMany({ user_id: decoded.user_id });
+//     console.log("Token deleted for user ID:", decoded.user_id);
+
+//     return res.status(200).json({
+//       success: true,
+//       msg: "OTP verified successfully. You can now reset your password.",
+//     });
+
+//   } catch (error) {
+//     console.error("Error verifying OTP:", error);
+//     return res.status(500).json({
+//       success: false,
+//       msg: "Internal Server Error",
+//     });
+//   }
+// };
+
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    console.log("Received email:", email);
+    console.log("Received OTP:", otp);
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        msg: "Email and OTP are required",
+      });
+    }
+
+    const passwordReset = await PasswordReset.findOne({ email, token: { $exists: true } });
+    if (!passwordReset) {
+      return res.status(404).json({
+        success: false,
+        msg: "OTP not found",
+      });
+    }
+    console.log("Found password reset token:", passwordReset.token);
+
+    let decoded;
+    try {
+      decoded = jwt.verify(passwordReset.token, process.env.JWT_SECRET);
+    } catch (err) {
+      // Kiểm tra lỗi nếu token hết hạn
+      if (err instanceof TokenExpiredError) {
+        return res.status(400).json({
+          success: false,
+          msg: "OTP has expired. Please request a new one.",
+        });
+      }
+      // Nếu không phải lỗi hết hạn token thì trả về lỗi chung
+      console.error("JWT verification failed:", err);
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid OTP token",
+      });
+    }
+    console.log("Decoded JWT:", decoded);
+
+    if (decoded.email !== email || decoded.randomOTP !== otp) {
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid OTP",
+      });
+    }
+
+    const tokenExpirationTime = decoded.exp * 1000;
+    const currentTime = Date.now();
+    console.log("Token expiration time:", tokenExpirationTime);
+    console.log("Current time:", currentTime);
+
+    if (currentTime > tokenExpirationTime) {
+      return res.status(400).json({
+        success: false,
+        msg: "OTP has expired",
+      });
+    }
+
+    await PasswordReset.deleteMany({ email: decoded.email });
+    console.log("Token deleted for user ID:", decoded.email);
+
+    return res.status(200).json({
+      success: true,
+      msg: "OTP verified successfully. You can now reset your password.",
+    });
+
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    return res.status(500).json({
+      success: false,
+      msg: "Internal Server Error",
+    });
+  }
+};
 
 const updateUser = async (req, res) => {
   try {
@@ -85,44 +334,46 @@ const signUpWithGmail = (req, res) => {
   const { userMail } = req.body;
 
   const config = {
-    service: 'gmail',
+    service: "gmail",
     port: 465,
     secure: true,
     logger: true,
     debug: true,
-    secureConnection: 'true',
+    secureConnection: "true",
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
-    tls:{
-      rejectUnauthorized: false
-    }
+    tls: {
+      rejectUnauthorized: false,
+    },
   };
 
   const transporter = nodemailer.createTransport(config);
 
   const MailGenerator = new Mailgen({
-    theme: 'default',
+    theme: "default",
     product: {
-      name: 'HỆ THỐNG BÌNH CHỌN T&M',
-      link: 'https://mailgen.js/',
+      name: "HỆ THỐNG BÌNH CHỌN T&M",
+      link: "https://mailgen.js/",
     },
   });
 
   const response = {
     body: {
-      name: 'HỆ THỐNG BÌNH CHỌN',
-      intro: 'ĐĂNG KÝ THÀNH CÔNG !!!',
+      name: "HỆ THỐNG BÌNH CHỌN",
+      intro: "ĐĂNG KÝ THÀNH CÔNG !!!",
       action: {
-        instructions: 'Để tiếp tục, vui lòng truy cập trang đăng nhập bằng cách nhấn vào nút bên dưới:',
+        instructions:
+          "Để tiếp tục, vui lòng truy cập trang đăng nhập bằng cách nhấn vào nút bên dưới:",
         button: {
-          color: '#22BC66',
-          text: 'Đăng nhập vào tài khoản của bạn',
-          link: 'http://localhost:3000/api/user/login', // Link đến trang đăng nhập
+          color: "#22BC66",
+          text: "Đăng nhập vào tài khoản của bạn",
+          link: "http://localhost:3000/api/user/login", // Link đến trang đăng nhập
         },
       },
-      outro: "Nếu bạn cần hỗ trợ hoặc có thắc mắc, vui lòng trả lời email này, chúng tôi sẵn sàng giúp đỡ.",
+      outro:
+        "Nếu bạn cần hỗ trợ hoặc có thắc mắc, vui lòng trả lời email này, chúng tôi sẵn sàng giúp đỡ.",
     },
   };
 
@@ -131,7 +382,7 @@ const signUpWithGmail = (req, res) => {
   const message = {
     from: process.env.EMAIL,
     to: userMail,
-    subject: 'ĐĂNG KÝ THÀNH CÔNG',
+    subject: "ĐĂNG KÝ THÀNH CÔNG",
     html: mail,
   };
   console.log("Sending email to:", userMail);
@@ -140,14 +391,13 @@ const signUpWithGmail = (req, res) => {
     .sendMail(message)
     .then(() => {
       return res.status(201).json({
-        msg: 'Bạn sẽ nhận được email xác nhận.',
+        msg: "Bạn sẽ nhận được email xác nhận.",
       });
     })
     .catch((error) => {
       return res.status(500).json({ error });
     });
 };
-
 
 const createUser = async (req, res) => {
   try {
@@ -177,7 +427,7 @@ const createUser = async (req, res) => {
     // Kiểm tra xem email đã tồn tại hay chưa
     if (checkUser) {
       return res.status(409).json({
-        status: "Error",
+        status: 409,
         message: "Email is already defined.",
       });
     }
@@ -212,22 +462,20 @@ const loginUser = async (req, res) => {
     if (!email || !password) {
       return res.status(500).json({
         status: "Err",
-        message: "email and password are required.",
+        message: "Email and password are required.",
       });
     }
 
-    const checkUser = await User.findOne({
-      email: email,
-    });
-    if (checkUser === null) {
+    const checkUser = await User.findOne({ email: email });
+    if (!checkUser) {
       return res.status(500).json({
         status: "Err",
-        message: "email is not defined.",
+        message: "Email is not defined.",
       });
     }
 
-    const checkPassword = bcrypt.compare(password, checkUser.password);
-    if (!checkPassword) {
+    // Kiểm tra mật khẩu trực tiếp
+    if (password !== checkUser.password) {
       return res.status(500).json({
         status: "Err",
         message: "Password is incorrect",
@@ -331,5 +579,7 @@ module.exports = {
   updateUserStatusToActive,
   signUpWithGmail,
   updateUser,
+  forgotPassword,
+  verifyOTP,
+  resetPasswordByEmail,
 };
-
