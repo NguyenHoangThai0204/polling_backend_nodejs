@@ -18,8 +18,6 @@ const routerTheNew = require('./src/routes/TheNewRoute');
 const routerUpload = require('./src/routes/UploadRoute');
 const routerAI = require('./src/routes/AIRouter');
 const ContentPoll = require('./src/models/ContentPoll');
-const { addWeeks, isBefore } = require('date-fns');
-const cron = require('node-cron');
 
 // Tải cấu hình từ file .env
 dotenv.config();
@@ -52,31 +50,6 @@ const connectToMongoDB = async () => {
     console.log('Error connecting to MongoDB', error.message);
   }
 };
-
-// Đặt lịch cron để chạy mỗi phút (dễ kiểm tra khi phát triển)
-cron.schedule('39 15 29 11 *', async () => {  // Chạy mỗi phút
-    console.log('Running the cron job to check and delete polling');
-    try {
-        const polls = await ContentPoll.find();  // Lấy tất cả polling
-
-        for (let poll of polls) {
-            const currentDate = new Date();
-            const pollEndDate = new Date(poll.timeEnd);
-            const deleteDate = addWeeks(pollEndDate, 3);
-
-            if (isBefore(currentDate, deleteDate)) {
-                // Nếu đã đủ 3 tuần kể từ ngày kết thúc polling, xóa polling
-                await ContentPoll.findByIdAndDelete(poll._id);
-                console.log(`Deleted poll with ID: ${poll._id}`);
-            }
-        }
-    } catch (error) {
-        console.error("Error deleting poll:", error);
-    }
-});
-
-// Thêm log khi cron được đăng ký
-console.log('Cron job is scheduled and will run every minute for testing');
 
 // Route không tìm thấy
 app.use((req, res) => {
