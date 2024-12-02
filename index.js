@@ -24,7 +24,7 @@ dotenv.config();
 // Middleware
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors({
-  origin: '*',
+  origin: ['https://pollweb.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
