@@ -190,3 +190,28 @@ exports.getVoteByUserIdAndPollId = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error: ' + error.message });
   }
 };
+
+// lấy ra danh sách các poll theo user id
+exports.getPollsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.body; // Lấy userId từ body
+
+    // Kiểm tra userId
+    if (!userId) {
+      return res.status(400).json({ message: 'Invalid userId' });
+    }
+
+    // Tìm tất cả Vote của userId
+    const votes = await Vote.find({ userId: userId });
+
+    res.status(200).json({
+      status: 'OK',
+      message: 'Get votes by userId success',
+      data: votes
+    });
+
+  } catch (error) {
+    console.error('Error getting votes by userId:', error);
+    res.status(500).json({ message: 'Internal Server Error: ' + error.message });
+  }
+};

@@ -1,7 +1,8 @@
+const { console } = require("inspector");
 const ContentPoll = require("../models/ContentPoll");
 const User = require("../models/User"); // Import model của User
 let io;
-
+const Vote = require("../models/Vote");
 exports.setSocket = (socketIo) => {
     io = socketIo;
 };
@@ -66,22 +67,54 @@ exports.createPolling = async (req, res) => {
     }
 };
 
+const mongoose = require('mongoose');
+
 exports.deletePolling = async (req, res) => {
     try {
-        const { id } = req.body; // Lấy id từ body
+        const { id } = req.body; // Lấy id của Poll từ body
+        const poll = await ContentPoll.findById(id);
+
+        if (!poll) {
+            return res.status(404).json({ message: "Poll not found" });
+        }
+
+        const userId = poll.authorId; // Lấy userId từ Poll
+
+        // Kiểm tra nếu userId có hợp lệ (ObjectId hợp lệ)
+        if (!mongoose.isValidObjectId(userId)) {
+            return res.status(400).json({ message: "Invalid userId in Poll" });
+        }
+
+        // Tìm user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        console.log("User found:", user);
+
+        // Loại bỏ Poll khỏi listPoll của người dùng
+        await User.updateOne(
+            { _id: userId },  // Tìm người dùng theo userId
+            { $pull: { listPoll: new mongoose.Types.ObjectId(id) } } // Loại bỏ Poll khỏi listPoll của người dùng
+        );
+        // Xóa Poll khỏi ContentPoll (nếu cần)
         await ContentPoll.findByIdAndDelete(id);
+
+        // Xóa tất cả các Vote liên quan đến Poll (nếu cần)
+        await Vote.deleteMany({ pollId: id });
+
         res.status(200).json({
             status: "OK",
             message: "Delete Polling success"
         });
-        if(io){
-            io.emit("deletePoll", {
-                pollId: id,
-            });
-            console.log("Đã gửi tín hiệu socket xóa poll");
-        }else{
-            console.log("io is null");}
 
+        // Gửi tín hiệu xóa Poll qua Socket
+        if (io) {
+            io.emit("deletePoll", { pollId: id });
+            console.log("Đã gửi tín hiệu socket xóa poll");
+        } else {
+            console.log("io is null");
+        }
     } catch (error) {
         console.error("Error deleting poll:", error);
         res.status(500).json({ message: "Internal Server Error: " + error });
