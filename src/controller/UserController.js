@@ -7,7 +7,10 @@ const jwt = require("jsonwebtoken");
 const PasswordReset = require("../models/PasswordReset");
 const Mailer = require("../helpers/Mailer");
 const {TokenExpiredError } = jwt;
-
+let io;
+setSocket = (socketIo) => {
+  io = socketIo;
+}
 require("dotenv").config();
 
 const resetPasswordByEmail = async (req, res) => {
@@ -104,76 +107,6 @@ const forgotPassword = async (req, res) => {
     });
   }
 };
-// const verifyOTP = async (req, res) => {
-//   try {
-//     const { email, otp } = req.body;
-//     console.log("Received email:", email);
-//     console.log("Received OTP:", otp);
-
-//     if (!email || !otp) {
-//       return res.status(400).json({
-//         success: false,
-//         msg: "Email and OTP are required",
-//       });
-//     }
-
-//     const passwordReset = await PasswordReset.findOne({ token: { $exists: true } });
-//     if (!passwordReset) {
-//       return res.status(404).json({
-//         success: false,
-//         msg: "OTP not found",
-//       });
-//     }
-//     console.log("Found password reset token:", passwordReset.token);
-
-//     let decoded;
-//     try {
-//       decoded = jwt.verify(passwordReset.token, process.env.JWT_SECRET);
-//     } catch (err) {
-//       console.error("JWT verification failed:", err);
-//       return res.status(400).json({
-//         success: false,
-//         msg: "Invalid OTP token",
-//       });
-//     }
-//     console.log("Decoded JWT:", decoded);
-
-//     if (decoded.email !== email || decoded.randomOTP !== otp) {
-//       return res.status(400).json({
-//         success: false,
-//         msg: "Invalid OTP",
-//       });
-//     }
-
-//     const tokenExpirationTime = decoded.exp * 1000;
-//     const currentTime = Date.now();
-//     console.log("Token expiration time:", tokenExpirationTime);
-//     console.log("Current time:", currentTime);
-
-//     if (currentTime > tokenExpirationTime) {
-//       return res.status(400).json({
-//         success: false,
-//         msg: "OTP has expired",
-//       });
-//     }
-
-//     await PasswordReset.deleteMany({ user_id: decoded.user_id });
-//     console.log("Token deleted for user ID:", decoded.user_id);
-
-//     return res.status(200).json({
-//       success: true,
-//       msg: "OTP verified successfully. You can now reset your password.",
-//     });
-
-//   } catch (error) {
-//     console.error("Error verifying OTP:", error);
-//     return res.status(500).json({
-//       success: false,
-//       msg: "Internal Server Error",
-//     });
-//   }
-// };
-
 
 const verifyOTP = async (req, res) => {
   try {
@@ -547,6 +480,15 @@ const updateUserStatusToNon = async (req, res) => {
       status: "OK",
       message: "User status updated to 'inactive'.",
     });
+    if(io) {
+      io.emit('user-status-changed', { id, status: "inactive" });
+      console.log("user status changed to inactive");
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
+
+
   } catch (error) {
     console.error("Error updating user status:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -564,6 +506,13 @@ const updateUserStatusToActive = async (req, res) => {
       status: "OK",
       message: "User status updated to 'inactive'.",
     });
+    if(io) {
+      io.emit('user-status-changed', { id, status: "active" });
+      console.log("user status changed to active");
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
   } catch (error) {
     console.error("Error updating user status:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -582,4 +531,5 @@ module.exports = {
   forgotPassword,
   verifyOTP,
   resetPasswordByEmail,
+  setSocket
 };

@@ -1,5 +1,10 @@
 const ContentPoll = require("../models/ContentPoll");
 const User = require("../models/User"); // Import model của User
+let io;
+
+exports.setSocket = (socketIo) => {
+    io = socketIo;
+};
 
 exports.deletePolling = async (req, res) => {
     try {
@@ -69,6 +74,14 @@ exports.deletePolling = async (req, res) => {
             status: "OK",
             message: "Delete Polling success"
         });
+        if(io){
+            io.emit("deletePoll", {
+                pollId: id,
+            });
+            console.log("Đã gửi tín hiệu socket xóa poll");
+        }else{
+            console.log("io is null");}
+
     } catch (error) {
         console.error("Error deleting poll:", error);
         res.status(500).json({ message: "Internal Server Error: " + error });
@@ -132,6 +145,15 @@ exports.updateTimeEndPoll = async (req, res) => {
             message: "Success",
             data: Polling
         });
+        if(io){
+            io.emit("updatePolling", {
+                pollId: Polling._id,
+                updatedPoll: Polling,
+            });
+            console.log("Đã gửi tín hiệu socket");
+        }else{
+            console.log("io is null");
+        }
     } catch (error) {
         console.error("Error finding polling:", error);
         res.status(500).json({ message: "Internal Server Error: " + error });

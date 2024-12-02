@@ -17,8 +17,8 @@ const voteController = require('./src/controller/VoteController'); // Import con
 const routerTheNew = require('./src/routes/TheNewRoute');
 const routerUpload = require('./src/routes/UploadRoute');
 const routerAI = require('./src/routes/AIRouter');
-
-
+const pollController = require('./src/controller/PollController');
+const userController = require('./src/controller/UserController');
 dotenv.config();
 
 // Middleware
@@ -75,6 +75,8 @@ io.on('connection', (socket) => {
 
 // Truyền io đến VoteController
 voteController.setSocket(io);
+pollController.setSocket(io);
+userController.setSocket(io);
 
 // Khởi động server
 server.listen(port, () => {
