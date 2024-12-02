@@ -35,11 +35,11 @@ exports.createVote = async (req, res) => {
     // 3. Emit sự kiện WebSocket cho frontend khi có sự thay đổi
     // Kiểm tra instance của socket.io trước khi emit
     if (io) {
-        io.emit('voteUpdate', {
+        io.emit('voteUpdateSL', {
           pollId: updatedPoll._id,
           updatedPoll: updatedPoll
         });
-        console.log('WebSocket event "voteUpdate" emitted successfully:');
+        console.log('WebSocket event "voteUpdateSL" emitted successfully:');
       } else {
         console.log('Socket.io instance is not set');
       }
@@ -58,6 +58,8 @@ exports.createVote = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error: ' + error.message });
   }
 };
+
+
 exports.createVotePrivate = async (req, res) => {
   try {
     const { pollId, userId, optionId } = req.body;
@@ -102,7 +104,7 @@ exports.createVotePrivate = async (req, res) => {
 
     // Emit sự kiện WebSocket nếu có
     if (io) {
-      io.emit("voteUpdate", {
+      io.emit("voteUpdateSL", {
         pollId: updatedPoll._id,
         updatedPoll: updatedPoll,
       });

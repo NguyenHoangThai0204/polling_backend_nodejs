@@ -7,37 +7,37 @@ exports.setSocket = (socketIo) => {
     io = socketIo;
 };
 
-exports.deletePolling = async (req, res) => {
-    try {
-        const { id } = req.body;
-        const poll = await ContentPoll.findById(id);
+// exports.deletePolling = async (req, res) => {
+//     try {
+//         const { id } = req.body;
+//         const poll = await ContentPoll.findById(id);
 
-        if (!poll) {
-            return res.status(404).json({ message: "Poll not found" });
-        }
+//         if (!poll) {
+//             return res.status(404).json({ message: "Poll not found" });
+//         }
 
-        const currentDate = new Date();
-        const pollEndDate = new Date(poll.timeEnd);
-        const deleteDate = addWeeks(pollEndDate, 3);
+//         const currentDate = new Date();
+//         const pollEndDate = new Date(poll.timeEnd);
+//         const deleteDate = addWeeks(pollEndDate, 3);
 
-        if (isBefore(currentDate, deleteDate)) {
-            // Nếu đã đủ 3 tuần, thực hiện xóa
-            await ContentPoll.findByIdAndDelete(id);
-            res.status(200).json({
-                status: "OK",
-                message: "Poll has been deleted"
-            });
-        } else {
-            res.status(400).json({
-                status: "Error",
-                message: "Poll is not eligible for deletion yet"
-            });
-        }
-    } catch (error) {
-        console.error("Error deleting poll:", error);
-        res.status(500).json({ message: "Internal Server Error: " + error });
-    }
-};
+//         if (isBefore(currentDate, deleteDate)) {
+//             // Nếu đã đủ 3 tuần, thực hiện xóa
+//             await ContentPoll.findByIdAndDelete(id);
+//             res.status(200).json({
+//                 status: "OK",
+//                 message: "Poll has been deleted"
+//             });
+//         } else {
+//             res.status(400).json({
+//                 status: "Error",
+//                 message: "Poll is not eligible for deletion yet"
+//             });
+//         }
+//     } catch (error) {
+//         console.error("Error deleting poll:", error);
+//         res.status(500).json({ message: "Internal Server Error: " + error });
+//     }
+// };
 
 exports.createPolling = async (req, res) => {
     try {
@@ -94,9 +94,14 @@ exports.deletePolling = async (req, res) => {
 
         // Loại bỏ Poll khỏi listPoll của người dùng
         await User.updateOne(
-            { _id: userId },  // Tìm người dùng theo userId
-            { $pull: { listPoll: new mongoose.Types.ObjectId(id) } } // Loại bỏ Poll khỏi listPoll của người dùng
+            { _id: userId }, // Tìm user theo userId
+            { $pull: { listPoll: { _id: id } } } // Loại bỏ object có _id khớp với id
         );
+        await User.updateOne(
+            { _id: userId }, // Tìm user theo userId
+            { $pull: { listVote: { _id: id } } } // Loại bỏ object có _id khớp với id
+        );
+
         // Xóa Poll khỏi ContentPoll (nếu cần)
         await ContentPoll.findByIdAndDelete(id);
 
