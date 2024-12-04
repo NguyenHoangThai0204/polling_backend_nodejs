@@ -1,6 +1,11 @@
 const TheNew = require('../models/TheNew');
 const { ObjectId } = require("mongodb");
 
+let io;
+const setSocket = (socketIo) => {
+    io = socketIo;
+};
+
 const createTheNew = async (req, res) => {
     try {
        
@@ -119,6 +124,14 @@ const deleteTheNew = async (req, res) => {
             status: "OK",
             message: "Successfully deleted.",
         });
+        if (io) {
+            io.emit("deleteThenew", { id: id });
+            console.log("Đã gửi tín hiệu socket xóa poll");
+        } else {
+            console.log("io is null");
+        }
+
+
     } catch (error) {
         console.error("Error deleting document:", error);
         res.status(500).json({
@@ -133,5 +146,5 @@ module.exports = {
  createTheNew,
  findAllTheNew,
  findAllTheNewById,
- deleteTheNew,
+ deleteTheNew,setSocket,
 };

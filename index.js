@@ -19,6 +19,7 @@ const routerUpload = require('./src/routes/UploadRoute');
 const routerAI = require('./src/routes/AIRouter');
 const pollController = require('./src/controller/PollController');
 const userController = require('./src/controller/UserController');
+const theNewController = require('./src/controller/TheNewController');
 dotenv.config();
 
 // Middleware
@@ -77,6 +78,7 @@ io.on('connection', (socket) => {
 voteController.setSocket(io);
 pollController.setSocket(io);
 userController.setSocket(io);
+theNewController.setSocket(io);
 
 // Khởi động server
 server.listen(port, () => {

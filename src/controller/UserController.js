@@ -189,24 +189,21 @@ const verifyOTP = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const {
+      _id,
       email,
-      password,
       fullName,
-      role,
-      status,
       province,
       district,
       ward,
       street,
-      avatar,
       phone,
-      dateOfBirth,
+      avatar,
     } = req.body; // Lấy các dữ liệu từ body request
 
     const { id } = req.params; // Lấy ID từ params
 
     // Kiểm tra xem ID có được cung cấp không
-    if (!id) {
+    if (!_id) {
       return res.status(400).json({
         status: "Err",
         message: "ID is required in params.",
@@ -214,7 +211,7 @@ const updateUser = async (req, res) => {
     }
 
     // Tìm user cần cập nhật
-    const user = await User.findById(id);
+    const user = await User.findById(_id);
     if (!user) {
       return res.status(404).json({
         status: "Err",
@@ -224,21 +221,22 @@ const updateUser = async (req, res) => {
 
     // Cập nhật các thông tin nếu được gửi
     if (email) user.email = email;
-    if (password) user.password = password; // Nên hash mật khẩu trước khi lưu
     if (fullName) user.fullName = fullName;
-    if (role) user.role = role;
-    if (status) user.status = status;
     if (province) user.province = province; // Cập nhật tỉnh
     if (district) user.district = district; // Cập nhật quận
     if (ward) user.ward = ward; // Cập nhật phường
     if (street) user.street = street; // Cập nhật đường
-    if (avatar) user.avatar = avatar; // Lưu URL avatar từ body
     if (phone) user.phone = phone; // Cập nhật số điện thoại
-    if (dateOfBirth) user.dateOfBirth = new Date(dateOfBirth); // Chuyển về kiểu Date nếu cần
+    if (avatar) user.avatar = avatar; // Cập nhật ảnh đại diện
 
     // Lưu các thay đổi vào database
     await user.save();
-
+    if(io){
+      io.emit('user-updated', user);
+      console.log("User socket successfully");
+    }else{
+      console.log("Socket.io not initialized");
+    }
     res.status(200).json({
       status: "OK",
       message: "User updated successfully.",

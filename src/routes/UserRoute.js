@@ -7,7 +7,7 @@ const { passwordResetVerificationValidator } = require("../helpers/Validations")
 router.put("/resetPassword", userController.resetPasswordByEmail);
 
 // Post: http://localhost:3000/api/user/updateUser
-router.put("/update_user/:id", userController.updateUser);
+router.put("/update_user", userController.updateUser);
 
 // Post: http://localhost:3000/api/user/signUpGmail
 router.post("/signUpGmail", userController.signUpWithGmail);
