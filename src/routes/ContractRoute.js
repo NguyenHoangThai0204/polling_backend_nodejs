@@ -5,7 +5,6 @@ const fs = require("fs");
 const web3Validator = require("web3-validator");
 
 console.log(web3Validator);
-// Kết nối với Ethereum node (ví dụ: Ganache)
 const web3 = new Web3("HTTP://127.0.0.1:8545");
 
 // ABI và địa chỉ của smart contract
@@ -13,7 +12,9 @@ const web3 = new Web3("HTTP://127.0.0.1:8545");
 const contractJSON = JSON.parse(
   fs.readFileSync("./build/contracts/PollingSys.json", "utf8")
 );
+
 const contractABI = contractJSON.abi;
+
 // address của smart contract
 // const contractAddress = "0x15B1B59f1437431E2A811B74eEDa132E817a6d82";
 const contractAddress = "0xdBb5c294d063bf489ec5a462E6fC438756c5Aa5E";
@@ -31,32 +32,6 @@ routers.get("/checkConnection", async (req, res) => {
   }
 });
 
-// routers.post('/createPoll', async (req, res) => {
-//     const accounts = await web3.eth.getAccounts();
-//     const { title } = req.body;
-
-//     console.log("createPoll", title, accounts[0]);
-
-//     try {
-//       // Gửi giao dịch đến blockchain
-//       const result = await myContract.methods.createPoll(title).send({
-//         from: accounts[0],
-//         gas: 3000000,
-//       });
-
-//       // Chuyển đổi kết quả thành JSON hợp lệ, xử lý BigInt
-//       const serializedResult = JSON.parse(
-//         JSON.stringify(result, (_, value) =>
-//           typeof value === "bigint" ? value.toString() : value
-//         )
-//     );
-//       // Trả về kết quả giao dịch
-//       res.json({ message: 'Poll created successfully', transaction: serializedResult });
-//     } catch (error) {
-//       console.error('Transaction failed:', error.message);
-//       res.status(500).json({ error: error.message });
-//     }
-//   });
 routers.post("/createPoll", async (req, res) => {
   const { title, author } = req.body; // Nhận địa chỉ author từ body
 
@@ -79,11 +54,15 @@ routers.post("/createPoll", async (req, res) => {
   try {
     const balanceBefore = await web3.eth.getBalance(author);
     // Gửi giao dịch đến blockchain
+    // const result = await myContract.methods.createPoll(title).send({
+    //   from: author, // Sử dụng địa chỉ author
+    //   gas: 3000000,
+    // });
     const result = await myContract.methods.createPoll(title).send({
       from: author, // Sử dụng địa chỉ author
       gas: 3000000,
+      gasPrice: await web3.eth.getGasPrice(),  // Đảm bảo sử dụng gasPrice thay vì các trường EIP-1559
     });
-
     // Chuyển đổi kết quả thành JSON hợp lệ, xử lý BigInt
     const serializedResult = JSON.parse(
       JSON.stringify(result, (_, value) =>
