@@ -54,6 +54,13 @@ contract PollingSys {
         _;
     }
 
+    // hàm kiểm tra địa chỉ đã vote chưa
+    // function hasVoted(uint8 _pollId) public view returns (bool) {
+    // return polls[_pollId].voters[msg.sender].hasVoted;
+    // }
+    function hasVoted(uint8 _pollId, address _voter) public view returns (bool) {
+    return polls[_pollId].voters[_voter].hasVoted;
+}
     function createPoll(string memory _title) public {
         pollCount++;
         Poll storage newPoll = polls[pollCount];

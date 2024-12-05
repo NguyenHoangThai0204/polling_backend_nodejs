@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { type } = require('os');
 
 // Define the Vote schema
 const voteSchema = new mongoose.Schema({
@@ -21,6 +22,9 @@ const voteSchema = new mongoose.Schema({
     type: String, // Optional, in case votes are recorded on the blockchain
     default: null,
   },
+  addRessWallet : {
+    type : String
+  }
 });
 
 // Create the Vote model
