@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema({
   },
   street: {
     type: String,
+  },
+  timeCreateSignup: {
+    type: Date,
+    default: Date.now,
   }
 });
 
