@@ -411,6 +411,17 @@ const loginUser = async (req, res) => {
         message: "Password is incorrect",
       });
     }
+    
+     if(io) {
+      io.emit('user-login', { userId: checkUser._id });
+
+      console.log("User socket login successfully");
+      console.log("User id: ", checkUser._id);
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
+
 
     res.status(200).json({
       status: "Ok",
@@ -419,6 +430,33 @@ const loginUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error login: " + error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// hàm logout user
+const logoutUser = async (req, res) => {
+  try {
+    const { id } = req.body; // Lấy id từ body
+    if (!id) {
+      return res.status(400).json({
+        status: "Err",
+        message: "ID is required.",
+      });
+    }
+    if(io) {
+      io.emit('user-logout', { id });
+      console.log("User socket logout successfully", id);
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
+    res.status(200).json({
+      status: "OK",
+      message: "Success",
+    });
+  } catch (error) {
+    console.error("Error logout user:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -529,5 +567,6 @@ module.exports = {
   forgotPassword,
   verifyOTP,
   resetPasswordByEmail,
-  setSocket
+  setSocket,
+  logoutUser,
 };
