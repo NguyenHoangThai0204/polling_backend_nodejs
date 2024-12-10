@@ -119,6 +119,9 @@ exports.createVotePrivate = async (req, res) => {
         pollId: updatedPoll._id,
         updatedPoll: updatedPoll,
       });
+      console.log('WebSocket event "voteUpdateSL" emitted voteprivate successfully:');
+    } else {
+      console.log("Socket.io instance is not set");
     }
 
     res.status(200).json({
