@@ -141,10 +141,78 @@ const deleteTheNew = async (req, res) => {
     }
 };
 
+const updateTheNew = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Kiểm tra xem ID có hợp lệ không
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({
+                status: "Err",
+                message: "Invalid ID format.",
+            });
+        }
+
+        // Lấy dữ liệu từ body
+        const {
+            tenBaiViet,
+            chuDeBaiViet,
+            hinhAnhBaiViet,
+            noiDungBaiViet,
+            nguoiViet,
+            thoiGianViet,
+        } = req.body;
+
+        // Tìm và cập nhật bản ghi
+        const updatedTheNew = await TheNew.findByIdAndUpdate(
+            id,
+            {
+                $set: {
+                    tenBaiViet,
+                    chuDeBaiViet,
+                    hinhAnhBaiViet,
+                    noiDungBaiViet,
+                    nguoiViet,
+                    thoiGianViet,
+                },
+            },
+            { new: true, runValidators: true } // `new: true` trả về dữ liệu đã cập nhật, `runValidators` kiểm tra dữ liệu hợp lệ
+        );
+
+        // Kiểm tra nếu không tìm thấy bản ghi
+        if (!updatedTheNew) {
+            return res.status(404).json({
+                status: "Err",
+                message: "The new not found.",
+            });
+        }
+
+        res.status(200).json({
+            status: "OK",
+            message: "Successfully updated.",
+            data: updatedTheNew,
+        });
+
+        // Phát tín hiệu qua socket nếu cần
+        if (io) {
+            io.emit("updateThenew", { id, updatedTheNew });
+            console.log("Đã gửi tín hiệu socket cập nhật bài viết");
+        } else {
+            console.log("io is null");
+        }
+    } catch (error) {
+        console.error("Error updating document:", error);
+        res.status(500).json({
+            status: "Err",
+            message: "Internal Server Error",
+        });
+    }
+};
 
 module.exports = {
  createTheNew,
  findAllTheNew,
  findAllTheNewById,
  deleteTheNew,setSocket,
+    updateTheNew,
 };

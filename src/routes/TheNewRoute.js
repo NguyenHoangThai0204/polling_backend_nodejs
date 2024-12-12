@@ -21,5 +21,8 @@ router.get("/find_the_new_by_id/:id", theNewController.findAllTheNewById);
 // Post http://localhost:3000/api/theNew/delete_the_new
 router.post("/delete_the_new/:id",theNewController.deleteTheNew);
 
+// update
+router.put("/update_the_new/:id",theNewController.updateTheNew);
+
 
 module.exports = router;
