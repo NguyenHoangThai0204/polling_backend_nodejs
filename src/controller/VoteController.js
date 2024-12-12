@@ -59,6 +59,52 @@ exports.createVote = async (req, res) => {
       .json({ message: "Internal Server Error: " + error.message });
   }
 };
+exports.checkVotePrivate = async (req, res) => {
+  try {
+    const { pollId, userId, optionId, addRessWallet } = req.body;
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!pollId || !userId || !optionId) {
+      return res
+        .status(400)
+        .json({ message: "pollId, userId, and optionId are required." });
+    }
+
+    // Kiểm tra xem userId đã vote cho pollId này chưa
+    const existingVote = await Vote.findOne({ pollId, userId });
+
+    if (existingVote) {
+      return res.status(400).json({
+        message: "You have already voted in this poll.",
+        pollId: pollId,
+        userId: userId,
+      });
+    }
+
+    // Kiểm tra xem địa chỉ ví đã vote chưa
+    if (addRessWallet !== null) {
+      const existingVoteWallet = await Vote.findOne({ pollId, addRessWallet });
+      if (existingVoteWallet) {
+        return res.status(400).json({
+          message: "You have already voted in this poll.",
+          pollId: pollId,
+          addRessWallet: addRessWallet,
+        });
+      }
+    }
+
+    // Nếu không có vote trước đó, chỉ trả về kết quả thành công mà không lưu vote
+    res.status(200).json({
+      status: "OK"
+    });
+
+  } catch (error) {
+    console.error("Error processing vote check:", error);
+    res
+      .status(500)
+      .json({ status: "ERROR" });
+  }
+};
 
 exports.createVotePrivate = async (req, res) => {
   try {

@@ -231,9 +231,10 @@ const updateUser = async (req, res) => {
 
     // Lưu các thay đổi vào database
     await user.save();
+
     if(io){
       io.emit('user-updated', user);
-      console.log("User socket successfully");
+      console.log("User update socket successfully");
     }else{
       console.log("Socket.io not initialized");
     }
