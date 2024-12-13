@@ -34,6 +34,10 @@ const contentPollSchema = new mongoose.Schema({
   typeContent: {
     type: String, 
   },
+  listEmailVote:{
+    type: [String],
+    default: null,
+  }
 });
 
 const ContentPoll = mongoose.model('ContentPoll', contentPollSchema);

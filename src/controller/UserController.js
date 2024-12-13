@@ -13,6 +13,77 @@ setSocket = (socketIo) => {
 }
 require("dotenv").config();
 
+
+// hàm thêm id vào listVote của user
+const addPollIdInListVoteOfUser = async (req, res) => {
+  try {
+    const { id, pollId } = req.body;
+
+    // Kiểm tra id và pollId có tồn tại
+    if (!id || !pollId) {
+      return res.status(400).json({
+        status: "Err",
+        message: "ID and pollId are required.",
+      });
+    }
+
+    // Tìm user theo id
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        status: "Err",
+        message: "User not found.",
+      });
+    }
+
+    // Đảm bảo listVote là mảng hợp lệ
+    if (!Array.isArray(user.listVote)) {
+      user.listVote = [];
+    }
+
+    // Kiểm tra nếu pollId đã tồn tại trong listVote
+    const isPollIdExist = user.listVote.some((existingVote) => {
+      // So sánh object `pollId` với object `existingVote`
+      return JSON.stringify(existingVote.id_vote) === JSON.stringify(pollId);
+    });
+
+    if (isPollIdExist) {
+      return res.status(400).json({
+        status: "Err",
+        message: "Poll ID already exists in the list.",
+      });
+    }
+
+    // Thêm pollId vào listVote dưới dạng đối tượng { id_vote: pollId }
+    user.listVote.push({ id_vote: pollId });
+
+    // Lưu lại thay đổi
+    await user.save();
+
+    if(io) {
+      io.emit('user-updated',user);
+      io.emit('addPollIdInListVoteOfUser');
+      console.log("User vote socket successfully");
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
+
+    return res.status(200).json({
+      status: "Success",
+      message: "Poll ID added successfully.",
+      data: user.listVote,
+    });
+  } catch (error) {
+    console.error("Error adding poll ID:", error);
+    return res.status(500).json({
+      status: "Err",
+      message: "Internal Server Error",
+    });
+  }
+};
+
+
 const resetPasswordByEmail = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -231,9 +302,10 @@ const updateUser = async (req, res) => {
 
     // Lưu các thay đổi vào database
     await user.save();
+
     if(io){
       io.emit('user-updated', user);
-      console.log("User socket successfully");
+      console.log("User update socket successfully");
     }else{
       console.log("Socket.io not initialized");
     }
@@ -411,6 +483,17 @@ const loginUser = async (req, res) => {
         message: "Password is incorrect",
       });
     }
+    
+     if(io) {
+      io.emit('user-login', { userId: checkUser._id });
+
+      console.log("User socket login successfully");
+      console.log("User id: ", checkUser._id);
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
+
 
     res.status(200).json({
       status: "Ok",
@@ -419,6 +502,33 @@ const loginUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error login: " + error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// hàm logout user
+const logoutUser = async (req, res) => {
+  try {
+    const { id } = req.body; // Lấy id từ body
+    if (!id) {
+      return res.status(400).json({
+        status: "Err",
+        message: "ID is required.",
+      });
+    }
+    if(io) {
+      io.emit('user-logout', { id });
+      console.log("User socket logout successfully", id);
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
+    res.status(200).json({
+      status: "OK",
+      message: "Success",
+    });
+  } catch (error) {
+    console.error("Error logout user:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -529,5 +639,7 @@ module.exports = {
   forgotPassword,
   verifyOTP,
   resetPasswordByEmail,
-  setSocket
+  setSocket,
+  logoutUser,
+  addPollIdInListVoteOfUser,
 };
