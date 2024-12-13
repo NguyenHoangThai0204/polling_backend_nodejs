@@ -43,32 +43,6 @@ routers.get("/checkVoted", async (req, res) => {
   }
 });
 
-// routers.post('/createPoll', async (req, res) => {
-//     const accounts = await web3.eth.getAccounts();
-//     const { title } = req.body;
-
-//     console.log("createPoll", title, accounts[0]);
-
-//     try {
-//       // Gửi giao dịch đến blockchain
-//       const result = await myContract.methods.createPoll(title).send({
-//         from: accounts[0],
-//         gas: 3000000,
-//       });
-
-//       // Chuyển đổi kết quả thành JSON hợp lệ, xử lý BigInt
-//       const serializedResult = JSON.parse(
-//         JSON.stringify(result, (_, value) =>
-//           typeof value === "bigint" ? value.toString() : value
-//         )
-//     );
-//       // Trả về kết quả giao dịch
-//       res.json({ message: 'Poll created successfully', transaction: serializedResult });
-//     } catch (error) {
-//       console.error('Transaction failed:', error.message);
-//       res.status(500).json({ error: error.message });
-//     }
-//   });
 routers.post("/createPoll", async (req, res) => {
   const { title, author } = req.body; // Nhận địa chỉ author từ body
 

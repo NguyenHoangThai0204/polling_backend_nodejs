@@ -47,4 +47,6 @@ router.post("/undeleteUser", userController.updateUserStatusToActive);
 // logout 
 router.post("/logout", userController.logoutUser);
 
+router.post("/add_pollid_to_listvote", userController.addPollIdInListVoteOfUser);
+
 module.exports = router;
