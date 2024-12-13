@@ -390,7 +390,7 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(500).json({
+      return res.status(400).json({
         status: "Err",
         message: "Email and password are required.",
       });
@@ -398,7 +398,7 @@ const loginUser = async (req, res) => {
 
     const checkUser = await User.findOne({ email: email });
     if (!checkUser) {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "Err",
         message: "Email is not defined.",
       });
@@ -406,7 +406,7 @@ const loginUser = async (req, res) => {
 
     // Kiểm tra mật khẩu trực tiếp
     if (password !== checkUser.password) {
-      return res.status(500).json({
+      return res.status(401).json({
         status: "Err",
         message: "Password is incorrect",
       });

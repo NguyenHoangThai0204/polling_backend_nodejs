@@ -8,7 +8,6 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const routeContract = require('./src/routes/ContractRoute');
 const routerUser = require('./src/routes/UserRoute');
 const routerPoll = require('./src/routes/PollRoute');
 const routerVote = require('./src/routes/VoteRoute');
@@ -37,7 +36,6 @@ app.use('/api/poll', routerPoll);
 app.use('/api/theNew', routerTheNew);
 app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
-app.use('/api/private', routeContract);
 app.use('/api/upload', routerUpload);
 app.use('/api/ai', routerAI);
 
