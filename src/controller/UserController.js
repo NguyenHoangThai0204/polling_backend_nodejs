@@ -61,6 +61,7 @@ const addPollIdInListVoteOfUser = async (req, res) => {
     await user.save();
 
     if(io) {
+      io.emit('user-updated',user);
       io.emit('addPollIdInListVoteOfUser');
       console.log("User vote socket successfully");
     }
