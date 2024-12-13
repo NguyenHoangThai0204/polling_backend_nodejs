@@ -97,11 +97,12 @@ exports.deletePolling = async (req, res) => {
             { _id: userId }, // Tìm user theo userId
             { $pull: { listPoll: { _id: id } } } // Loại bỏ object có _id khớp với id
         );
-        await User.updateOne(
-            { _id: userId }, // Tìm user theo userId
-            { $pull: { listVote: { _id: id } } } // Loại bỏ object có _id khớp với id
-        );
 
+        await User.updateMany(
+            { "listVote.id_vote": id }, // Tìm các user có id_vote khớp với id
+            { $pull: { listVote: { id_vote: id } } } // Loại bỏ object trong listVote có id_vote khớp
+        );
+        
         // Xóa Poll khỏi ContentPoll (nếu cần)
         await ContentPoll.findByIdAndDelete(id);
 
