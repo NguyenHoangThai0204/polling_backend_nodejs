@@ -60,6 +60,14 @@ const addPollIdInListVoteOfUser = async (req, res) => {
     // Lưu lại thay đổi
     await user.save();
 
+    if(io) {
+      io.emit('addPollIdInListVoteOfUser');
+      console.log("User vote socket successfully");
+    }
+    else {
+      console.log("Socket.io not initialized");
+    }
+
     return res.status(200).json({
       status: "Success",
       message: "Poll ID added successfully.",
