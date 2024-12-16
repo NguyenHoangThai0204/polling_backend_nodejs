@@ -102,7 +102,7 @@ exports.deletePolling = async (req, res) => {
             { "listVote.id_vote": id }, // Tìm các user có id_vote khớp với id
             { $pull: { listVote: { id_vote: id } } } // Loại bỏ object trong listVote có id_vote khớp
         );
-        
+
         // Xóa Poll khỏi ContentPoll (nếu cần)
         await ContentPoll.findByIdAndDelete(id);
 
@@ -198,3 +198,6 @@ exports.updateTimeEndPoll = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error: " + error });
     }
 };
+
+
+// 

@@ -19,6 +19,7 @@ const routerAI = require('./src/routes/AIRouter');
 const pollController = require('./src/controller/PollController');
 const userController = require('./src/controller/UserController');
 const theNewController = require('./src/controller/TheNewController');
+const roundPoll = require('./src/routes/RoundRouter');
 dotenv.config();
 
 // Middleware
@@ -38,6 +39,8 @@ app.use('/api/vote', routerVote);
 app.use('/api/auth', routerSSO);
 app.use('/api/upload', routerUpload);
 app.use('/api/ai', routerAI);
+app.use('/api/round', roundPoll);
+
 
 // Route không tìm thấy
 app.use((req, res) => {

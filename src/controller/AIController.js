@@ -1,10 +1,44 @@
-const axios = require('axios');
+const axios = require("axios");
 
 // URL chính xác của Hugging Face API cho mô hình phân tích cảm xúc
-const HUGGINGFACE_API_URL = 'https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english';
+const HUGGINGFACE_API_URL =
+  "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english";
 
-// Hàm phân tích văn bản (checkEthicalStandards)
+// Đảm bảo bạn đã cài đặt openai
+const { OpenAI } = require("openai");
+require("dotenv").config(); // Để sử dụng biến môi trường từ file .env
+
+// Khởi tạo OpenAI API
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 exports.checkEthicalStandards = async (req, res) => {
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).send({ message: "Vui lòng cung cấp văn bản để phân tích." });
+  }
+
+  try {
+    // Tạo yêu cầu với mô hình OpenAI
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // Hoặc mô hình bạn muốn sử dụng
+      messages: [
+        { role: "system", content: "Bạn là một trợ lý AI thông minh." },
+        { role: "user", content: `Phân tích nội dung sau: "${text}"` },
+      ],
+    });
+
+    // Lấy kết quả từ phản hồi của OpenAI API
+    const result = response.choices[0].message.content.trim();
+    res.status(200).json({ result });
+  } catch (error) {
+    console.error("Lỗi API:", error.message);
+    res.status(500).json({ error: "Đã xảy ra lỗi khi xử lý yêu cầu." });
+  }
+};
+exports.checkEthicalStandards_HUGGINGFACE_API_URL = async (req, res) => {
   const { text } = req.body; // Văn bản cần phân tích
 
   // Kiểm tra nếu không có văn bản được cung cấp
@@ -68,7 +102,6 @@ exports.checkEthicalStandards = async (req, res) => {
 
   makeRequest(3); // Thử lại tối đa 3 lần
 };
-
 // Hàm kiểm tra kết nối với Hugging Face API
 async function checkConnection() {
   try {
@@ -83,7 +116,10 @@ async function checkConnection() {
       console.log("Kết nối với Hugging Face API thành công!");
       return true;
     } else {
-      console.error("Kết nối không thành công, mã trạng thái:", response.status);
+      console.error(
+        "Kết nối không thành công, mã trạng thái:",
+        response.status
+      );
       return false;
     }
   } catch (error) {
