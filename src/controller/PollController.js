@@ -7,37 +7,6 @@ exports.setSocket = (socketIo) => {
     io = socketIo;
 };
 
-// exports.deletePolling = async (req, res) => {
-//     try {
-//         const { id } = req.body;
-//         const poll = await ContentPoll.findById(id);
-
-//         if (!poll) {
-//             return res.status(404).json({ message: "Poll not found" });
-//         }
-
-//         const currentDate = new Date();
-//         const pollEndDate = new Date(poll.timeEnd);
-//         const deleteDate = addWeeks(pollEndDate, 3);
-
-//         if (isBefore(currentDate, deleteDate)) {
-//             // Nếu đã đủ 3 tuần, thực hiện xóa
-//             await ContentPoll.findByIdAndDelete(id);
-//             res.status(200).json({
-//                 status: "OK",
-//                 message: "Poll has been deleted"
-//             });
-//         } else {
-//             res.status(400).json({
-//                 status: "Error",
-//                 message: "Poll is not eligible for deletion yet"
-//             });
-//         }
-//     } catch (error) {
-//         console.error("Error deleting poll:", error);
-//         res.status(500).json({ message: "Internal Server Error: " + error });
-//     }
-// };
 
 exports.createPolling = async (req, res) => {
     try {
@@ -66,6 +35,44 @@ exports.createPolling = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error: " + error });
     }
 };
+
+
+exports.updatePolling = async (req, res) => {
+    try {
+        const poll = req.body; // Lấy thông tin Poll từ body
+        const pollNew = await ContentPoll.findById(poll._id);
+        if (!pollNew) {
+            return res.status(404).json({ message: "Poll not found" });
+        }
+
+        // Cập nhật thông tin Poll
+        pollNew.title = req.body.title;
+        pollNew.description = req.body.description;
+        pollNew.options = req.body.options;
+        pollNew.timeStart = req.body.timeStart;
+        pollNew.timeEnd = req.body.timeEnd;
+        pollNew.authorId = req.body.authorId;
+        await pollNew.save();
+
+        res.status(200).json({
+            status: "OK",
+            message: "Update Polling success",
+            data: poll
+        });
+
+        // Gửi tín hiệu cập nhật Poll qua Socket
+        if (io) {
+            io.emit("updatePoll", { pollId: pollNew._id, updatedPoll: pollNew });
+            console.log("Đã gửi tín hiệu socket cập nhật poll");
+        } else {
+            console.log("io is null");
+        }
+    } catch (error) {
+        console.error("Error updating poll:", error);
+        res.status(500).json({ message: "Internal Server Error: " + error });
+    }
+};
+
 
 const mongoose = require('mongoose');
 

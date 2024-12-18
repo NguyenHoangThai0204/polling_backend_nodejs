@@ -42,4 +42,7 @@ routers.post("/update_timeEnd_poll/:id", pollController.updateTimeEndPoll)
 
 routers.post("/delete_poll", pollController.deletePolling)
 
+//
+routers.post("/update_poll", pollController.updatePolling)
+
 module.exports = routers;
