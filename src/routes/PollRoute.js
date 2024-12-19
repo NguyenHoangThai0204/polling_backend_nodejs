@@ -45,4 +45,6 @@ routers.post("/delete_poll", pollController.deletePolling)
 //
 routers.post("/update_poll", pollController.updatePolling)
 
+routers.post("/find_polls_by_name", pollController.findPollingByName)
+
 module.exports = routers;

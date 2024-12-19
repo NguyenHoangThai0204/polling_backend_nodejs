@@ -49,6 +49,7 @@ exports.updatePolling = async (req, res) => {
         pollNew.title = req.body.title;
         pollNew.description = req.body.description;
         pollNew.options = req.body.options;
+        pollNew.avatar = req.body.avatar;
         pollNew.timeStart = req.body.timeStart;
         pollNew.timeEnd = req.body.timeEnd;
         pollNew.authorId = req.body.authorId;
@@ -72,6 +73,23 @@ exports.updatePolling = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error: " + error });
     }
 };
+
+// tìm mảng cuộc bình chọn có cùng tên 
+exports.findPollingByName = async (req, res) => {
+    try {
+        const {title} = req.body;  // Lấy giá trị id từ params
+        const Polling = await ContentPoll.find({title: title});
+        // trả về danh sách các cuộc bình chọn có cùng tên
+        res.status(200).json({
+            status: "OK",
+            message: "Success",
+            data: Polling
+        });
+    } catch (error) {
+        console.error("Error finding polling:", error);
+        res.status(500).json({ message: "Internal Server Error: " + error });
+    }
+}
 
 
 const mongoose = require('mongoose');
